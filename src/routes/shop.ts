@@ -1,7 +1,15 @@
 import { Router } from "express";
-
+import { getCart, getCheckout, getIndex, getProducts } from "../controller/shop.js";
 export const router = Router();
 
-router.get('/', (req, res, next) => {
-  res.render('shop', { pageTitle: 'shop', prods: [{ title: 'apple', price: 19.99, desc: 'this is test!' }, { title: 'apple', price: 19.99, desc: 'this is test!' }, { title: 'apple', price: 19.99, desc: 'this is test!' }] });
-});
+// / (index)
+router.get('/', getIndex);
+
+// /products
+router.get('/products', getProducts);
+
+// /cart
+router.get('/cart', getCart);
+
+// /checkout
+router.get('/checkout', getCheckout);

@@ -4,7 +4,7 @@ import KEY from './util/key.js';
 /* import routers */
 import {router as adminRouter} from './routes/admin.js';
 import {router as shopRouter} from './routes/shop.js';
-import { resolve } from 'path';
+import * as errorHandler from './controller/error.js';
 
 const server = e();
 
@@ -22,8 +22,5 @@ server.use(e.urlencoded({extended: true}));
 server.use('/admin', adminRouter);
 server.use(shopRouter);
 
-server.use((req, res, next) => {
-    res.status(404).render('404', {pageTitle: "Page Not Found"});
-});
-
+server.use('/',errorHandler.get404);
 server.listen(KEY.PORT);

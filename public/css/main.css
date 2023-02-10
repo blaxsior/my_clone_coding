@@ -80,16 +80,24 @@ main {
 
 .card__image img {
   width: 100%;
+  max-width: 350px;
 }
 
 .card__actions {
     padding: 1rem;
     text-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 .card__actions button,
 .card__actions a {
     margin: 0 0.25rem;
+    text-decoration: none;
+}
+
+.card__actions a{
+      color: inherit;
 }
 
 .btn {
@@ -99,6 +107,7 @@ main {
   background: white;
   border-radius: 3px;
   cursor: pointer;
+  width:max-content;
 }
 
 .btn:hover,
