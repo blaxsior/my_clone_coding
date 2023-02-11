@@ -1,0 +1,15 @@
+<%- include('../layouts/header.ejs', {css_list: []}) %>
+<main>
+    <% if ( prods.length> 0) { %>
+        <h1>My Products</h1>
+        <p>List of all the products...</p>
+        <div class="grid">
+            <% for(let prod of prods) { %>
+                <%- include('../components/prod/ProdItem',{prod: prod}) %>
+            <% } %>
+        </div>
+    <% } else { %>
+        <h1>No Products Founds!</h1>
+    <% } %>
+</main>
+<%- include('../layouts/footer.ejs') %>

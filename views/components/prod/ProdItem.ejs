@@ -1,0 +1,9 @@
+<article class="card product-item">
+    <%- include('./ProdInfo', {prod}) %>
+    <div class="card__actions">
+        <button class="btn">
+            <a href="/products/<%= prod.id %>">Details</a>
+        </button>
+        <%- include('../cart/AddToCart',{id: prod.id}) %>
+    </div>
+</article>
