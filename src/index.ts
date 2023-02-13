@@ -5,6 +5,8 @@ import KEY from './util/key.js';
 import { router as adminRouter } from './routes/admin.js';
 import { router as shopRouter } from './routes/shop.js';
 import * as errorHandler from './controller/error.js';
+/* sql db connection */
+import { MYSQL_DB } from './db/mysqldb.js';
 
 const server = e();
 
@@ -26,4 +28,13 @@ server.get('/not-found', errorHandler.get404)
 server.use('/', (req, res, next) => {
     res.redirect('/not-found');
 });
-server.listen(KEY.PORT);
+
+try {
+    server.listen(KEY.PORT);
+    MYSQL_DB.init();
+} catch(e) {
+    if(e instanceof Error) {
+        console.error(e.message);
+    }
+    process.exit(-1);
+} 

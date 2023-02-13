@@ -29,7 +29,7 @@ export const getEditProduct: RequestHandler = async (req, res, next) => {
         return res.redirect('/');
     }
 
-    const prod = await Product.findById(id);
+    const prod = await Product.findById(Number(id));
     if(prod) {
         return res.render('admin/edit-product', {
             pageTitle: 'Add Product',
@@ -72,10 +72,12 @@ export const getProducts: RequestHandler = async (req, res, next) => {
 export const postDeleteProduct: RequestHandler = async (req, res, next) => {
     const {id} = req.body;
 
-    const dProd = await Product.deleteById(id);
+    const dProd = await Product.findById(id);
     if(dProd)
     {
+        await Product.deleteById(dProd.id!);
         await Cart.deleteProduct(id, dProd.price);
     }
+
     return res.redirect('/admin/products');
 }

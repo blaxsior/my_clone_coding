@@ -13,11 +13,11 @@
     </div>
     <div class="form-control">
         <label for="price">Price</label>
-        <input type="number" min="0" name="price" id="price" value="<%= product.price %>">
+        <input type="number" min="0" step="0.001" name="price" id="price" value="<%= product.price %>">
     </div>
     <div class="form-control">
         <label for="description">Description</label>
-        <textarea name="description" id="description" rows="6" ><%= product.desc %></textarea>
+        <textarea name="description" id="description" rows="6" ><%= product.description %></textarea>
     </div>
     <button class="btn" type="submit"><%= editing ? "Edit" : "Add" %> Content</button>
 </form>

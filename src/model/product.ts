@@ -1,41 +1,37 @@
-
-import { readFile, writeFile } from 'fs/promises';
-import { resolve } from 'path';
-import { randomBytes } from 'crypto';
-
+import { ResultSetHeader } from "mysql2";
+import { MYSQL_DB } from "../db/mysqldb.js";
 export interface IProd {
-    id: string;
+    id?: number; // auto-increment INT
     title: string;
     imageUrl: string;
     price: number;
-    desc: string;
+    description: string;
 }
 
 export class Product {
-    private static filename = resolve('src', 'db', 'db.json');
-    id: string;
+    id?: number;
     title: string;
     imageUrl: string;
     price: number;
-    desc: string;
-
+    description: string;
+ 
     static fromIProd(data: IProd) {
         return new Product(
             data.title,
             data.imageUrl,
             data.price,
-            data.desc,
+            data.description,
             data.id
         );
     }
 
-    constructor(title: string, imageUrl: string, price: string | number, description: string, id?: string) {
-        this.id = id ?? Product.getId();
+    constructor(title: string, imageUrl: string, price: string | number, description: string, id?: number) {
+        this.id = id;
         this.title = title;
         this.imageUrl = imageUrl;
         const _price = Number(price);
         this.price = isNaN(_price) ? 0 : _price;
-        this.desc = description;
+        this.description = description;
     }
 
     setData(title: string, imageUrl: string, price: string, description: string) {
@@ -43,41 +39,44 @@ export class Product {
         this.imageUrl = imageUrl;
         const _price = Number(price);
         this.price = isNaN(_price) ? 0 : _price;
-        this.desc = description;
+        this.description = description;
     }
 
-    private static getId() {
-        return randomBytes(16).toString('hex');
-    }
+    // private static getId() {
+    //     return randomBytes(16).toString('hex');
+    // }
     /**
      * @returns Product에 대한 JSON을 반환(원 타입 아님)
      */
     private static async getProducts() {
-        const file = await readFile(Product.filename);
-        let arr: IProd[];
-        try {
-            arr = JSON.parse(file.toString('utf8'));
-        }
-        catch (e) {
-            arr = [];
-        }
-
+        const  [arr, _] = await MYSQL_DB.query('SELECT * FROM products') as [IProd[], any];
+        // 데이터패킷[], 필드 패킷[] = 칼럼 정의[]
+        console.log(arr, _);
         return arr;
     }
+
     /**
      * 현재 product 인스턴스를 저장.  
      * 기존에 존재하면 값을 덮어쓰고, 존재하지 않으면 새로 넣음
      */
     async save() {
-        const arr = await Product.getProducts();
-        const idx = arr.findIndex(it => it.id === this.id);
-        if(idx > -1) { // 존재하면
-            arr[idx] = this.data;
-        }
-        else {
-            arr.push(this);
-        }
-        await writeFile(Product.filename, JSON.stringify(arr));
+        if(this.id) { 
+            // 데이터 + ResultSetHeader 타입을 반환
+            const [data, fields] = await MYSQL_DB.query('SELECT 1 FROM products WHERE ID = ?', [this.id]) as [IProd[], any];
+            console.log("find", data, fields); // 데이터와 ColumnDefinition 배열을 반환.
+            if(data.length > 0) { // 데이터가 이미 존재하는 경우 -> UPDATE
+                const [result] = await MYSQL_DB.query("UPDATE PRODUCTS SET title = ?, imageUrl = ?, price = ?, description = ? WHERE id = ?;", 
+                [this.title, this.imageUrl, this.price, this.description, this.id]);
+                console.log("update", result); // ResultSetHeader 타입을 반환
+                return;
+            }
+        } 
+        // 존재하지 않는 데이터의 경우 -> INSERT
+        const [rows, _] = await MYSQL_DB.query(
+            "INSERT INTO PRODUCTS(title, imageUrl, price, description) VALUES (?, ?, ?, ?)", 
+            [this.title, this.imageUrl, this.price, this.description]) as [ResultSetHeader, any];
+        console.log("insert", rows, _); // ResultSetHeader을 반환
+        this.id = rows.insertId;
     }
 
     /**
@@ -103,19 +102,15 @@ export class Product {
         return await this.getProducts();
     }
 
-    static async findById(id: string) {
-        const prod_list = await this.fetchAll();
-        const result = prod_list.find(prod => prod.id === id);
-        return result;
+    static async findById(id: number) {
+        const [data] = await MYSQL_DB.query("SELECT * FROM products WHERE id = ?",[id]);
+        if (Array.isArray(data) && data.length > 0) {
+            return data[0] as IProd;
+        }
     }
 
-    static async deleteById(id: string) {
-        const prod_list = await this.getProducts();
-        const dElemIdx = prod_list.findIndex(it => it.id === id);
-        if(dElemIdx > -1) { // 존재한다면 -> 제거하고 데이터베이스에 반영
-            const dElem = prod_list.splice(dElemIdx, 1)[0];
-            await writeFile(Product.filename, JSON.stringify(prod_list));
-            return dElem;
-        }
+    static async deleteById(id: number) {
+        const [result] = await MYSQL_DB.query("DELETE FROM products WHERE id = ?",[id]) as [ResultSetHeader, any];
+        // console.log(result); //ResultSetHeader 반환
     }
 }

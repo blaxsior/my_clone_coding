@@ -2,7 +2,7 @@ import { resolve } from "path";
 import { readFile, writeFile } from "fs/promises";
 
 export interface CartItem {
-    id: string;
+    id?: number;
     count: number;
 }
 
@@ -14,7 +14,7 @@ export interface CartItems {
 export class Cart {
     private static filename = resolve('src', 'db', 'cart.json');
 
-    static async addProduct(id: string, prodPrice: number) {
+    static async addProduct(id: number, prodPrice: number) {
         let cart: CartItems;
 
         // 존재하는 제품인지 검사
@@ -39,7 +39,7 @@ export class Cart {
         await writeFile(this.filename, JSON.stringify(cart));
     }
 
-    static async deleteProduct(id: string, price: number) {
+    static async deleteProduct(id: number, price: number) {
         const cart = await this.getCart();
 
         const dElemIdx = cart.items.findIndex(it => it.id === id);

@@ -13,12 +13,12 @@ export const getProducts: RequestHandler = async (req, res, next) => {
         activeShop: true,
         productCSS: true
     });
-};
+}; 
 
 export const getProductDetail: RequestHandler = async (req, res, next) => {
     const { id } = req.params;
 
-    const product = await Product.findById(id);
+    const product = await Product.findById(Number(id));
     if (product) {
         return res.render('shop/product-detail', {
             prod: product,
@@ -49,6 +49,8 @@ export const getIndex: RequestHandler = async (req, res, next) => {
 export const getCart: RequestHandler = async (req, res, next) => {
     const cart = await Cart.getCart();
     const products = await Product.fetchAll();
+    
+    // 여기는 처음부터 join해서 가져오도록 구현하는 편이 좋을 것 같음
 
     const cartProducts: Pick<CartItems, 'totalPrice'> & {
         items: (IProd & CartItem)[]
