@@ -49,9 +49,9 @@ export class OrderEntity implements IOrder  {
         : await db.order.create({
             data: {
                 uid: this.uid
-                
             }
-        })
+        });
+        
         this.id = result.id;
     }
 

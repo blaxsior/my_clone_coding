@@ -51,7 +51,7 @@ model CartItem {
 
 model Order {
   id  Int @id @default(autoincrement())
-  uid Int @unique
+  uid Int
 
   items OrderItem[] // many-to-many explicitly
   user  User        @relation(fields: [uid], references: [id])
