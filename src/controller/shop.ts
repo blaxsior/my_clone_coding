@@ -1,10 +1,11 @@
 import type { RequestHandler } from 'express';
-import { Cart, type CartItem, type CartItems } from '../model/cart.js';
-import { IProd, Product } from '../model/product.js';
+import { CartEntity } from '../model/cart.js';
+import { OrderEntity } from '../model/order.js';
+import { ProductEntity } from '../model/product.js';
 
 /* 제품 화면 */
 export const getProducts: RequestHandler = async (req, res, next) => {
-    const products = await Product.fetchAll();
+    const products = await ProductEntity.fetchAll();
     res.render('shop/product-list', {
         prods: products,
         pageTitle: 'Products',
@@ -13,12 +14,14 @@ export const getProducts: RequestHandler = async (req, res, next) => {
         activeShop: true,
         productCSS: true
     });
-}; 
+};
 
+/* 디테일 페이지 */
 export const getProductDetail: RequestHandler = async (req, res, next) => {
     const { id } = req.params;
+    req.user
 
-    const product = await Product.findById(Number(id));
+    const product = await ProductEntity.findById(Number(id));
     if (product) {
         return res.render('shop/product-detail', {
             prod: product,
@@ -35,7 +38,7 @@ export const getProductDetail: RequestHandler = async (req, res, next) => {
 
 /* 메인 화면 */
 export const getIndex: RequestHandler = async (req, res, next) => {
-    const products = await Product.fetchAll();
+    const products = await ProductEntity.fetchAll();
     res.render('shop/index', {
         prods: products,
         pageTitle: 'Shop',
@@ -46,59 +49,70 @@ export const getIndex: RequestHandler = async (req, res, next) => {
     });
 }
 
+/* 카트 페이지 */
 export const getCart: RequestHandler = async (req, res, next) => {
-    const cart = await Cart.getCart();
-    const products = await Product.fetchAll();
-    
-    // 여기는 처음부터 join해서 가져오도록 구현하는 편이 좋을 것 같음
-
-    const cartProducts: Pick<CartItems, 'totalPrice'> & {
-        items: (IProd & CartItem)[]
-    } = {
-        items: [],
-        totalPrice: cart.totalPrice
-    };
-
-    for (const cartItem of cart.items) {
-        const product = products.find(it => it.id === cartItem.id);
-        if (product) { // 대응되는 제품이 존재하는 경우
-            const item: IProd & CartItem = {
-                ...product,
-                count: cartItem.count
-            };
-            cartProducts.items.push(item);
-        }
+    const user = req.user;
+    if (user) {
+        let cart = await CartEntity.getCartDataByUid(user.id);
+        return res.render('shop/cart', {
+            path: '/cart',
+            pageTitle: 'Your Cart',
+            cart: cart
+        });
     }
 
-    res.render('shop/cart', {
-        pageTitle: 'Cart',
-        path: '/cart',
-        cart: cartProducts
-    });
+    res.redirect('not-found');
 }
 
+/* 카트에 제품 담는 버튼 클릭 */
 export const postAddToCart: RequestHandler = async (req, res, next) => {
     const { id } = req.body;
-    const product = await Product.findById(id);
-
-    if (product && !isNaN(product.price)) { // 제품이 존재 & 가격이 정상적인 경우
-        await Cart.addProduct(id, product.price);
+    const product = await ProductEntity.findById(id);
+    const user = req.user;
+    console.log('post cart');
+    if (product && user) { // 제품 및 유저 존재         
+        let cart = await CartEntity.getCartEntityByUid(user.id);
+        if (cart) {
+            await cart.addProduct(product.id, 1);
+        }
     }
-
+    console.log('redirect to cart')
     res.redirect('/cart');
 }
 
+/* 카트 내에서 Delete 버튼 클릭하는 경우 */
 export const postDeleteFromCart: RequestHandler = async (req, res, next) => {
     const { id } = req.body;
-    const product = await Product.findById(id);
-    if (product) {
-        await Cart.deleteProduct(id, product.price);
+    const product = await ProductEntity.findById(id);
+    const user = req.user;
+    if (product && user) {
+        let cart = await CartEntity.getCartEntityByUid(user.id);
+        if (cart) {
+            await cart.deleteProduct(product.id, 1);
+        }
     }
 
     res.redirect('/cart');
 }
 
 export const getOrders: RequestHandler = async (req, res, next) => {
+    res.render('shop/orders', {
+        pageTitle: 'Your Orders',
+        path: '/orders'
+    });
+}
+
+export const postOrder: RequestHandler = async (req, res, next) => {
+    const user = req.user;
+    if(user) {
+        const cart = await CartEntity.getCartEntityByUid(user.id);
+        if(cart) {
+            const items = await cart.getCartItems();
+            const order = new OrderEntity({uid: user.id});
+            await order.save(items); // 주문 생성
+        }
+    }
+
     res.render('shop/orders', {
         pageTitle: 'Your Orders',
         path: '/orders'
