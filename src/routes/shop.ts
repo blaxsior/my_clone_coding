@@ -1,25 +1,28 @@
 import { Router } from "express";
-import { getCart, getCheckout, getIndex, getOrders, getProductDetail, getProducts, postAddToCart, postDeleteFromCart } from "../controller/shop.js";
+import * as shopController from "../controller/shop.js";
 export const router = Router();
 
 // / (index)
-router.get('/', getIndex);
+router.get('/', shopController.getIndex);
 
 // /products/:id
-router.get('/products/:id', getProductDetail);
+router.get('/products/:id', shopController.getProductDetail);
 
 // /products
-router.get('/products', getProducts);
+router.get('/products', shopController.getProducts);
 
 
 // /cart
-router.get('/cart', getCart);
-router.post('/cart', postAddToCart);
+router.get('/cart', shopController.getCart);
+router.post('/cart', shopController.postAddToCart);
 // /cart-delete-item POST
-router.post('/cart-delete-item', postDeleteFromCart);
+router.post('/cart-delete-item', shopController.postDeleteFromCart);
 
 // /orders
-router.get('/orders',getOrders);
+router.get('/orders',shopController.getOrders);
+
+// /create-order POST
+router.post('/create-order', shopController.postOrder);
 
 // /checkout
-router.get('/checkout', getCheckout);
+router.get('/checkout', shopController.getCheckout);

@@ -1,3 +1,10 @@
 import {PrismaClient} from '@prisma/client';
 
-const client = new PrismaClient();
+export const db = new PrismaClient();
+
+/**
+ * prisma 클라이언트를 데이터베이스와 연결
+ */
+export async function dbConn() {
+    await db.$connect();
+}

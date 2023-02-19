@@ -2,26 +2,30 @@
 <main>
     <h1>Cart</h1>
     <% if(cart.items.length > 0) { %>
-    <div class="cart_title">Items</div>
-    <ul>
-        <% for(const item of cart.items) { %>
-        <li>
+    <div  class="cart_page">
+        <div class="cart_title">Items</div>
+        <ul class="cart_list">
+            <% for(const item of cart.items) { %>
+            <li>
+                <div class="cart_item">
+                    <div><%= item.product.title %> ( <%= item.quantity %> )</div>
+                    <!-- <img src="<%= item.product.imageUrl || "/img/mollu.jfif" %>" alt="<%= item.title %>"> -->
+                    <div>Price: <%= item.product.price %></div>
+                    <form action="/cart-delete-item" method="POST">
+                        <input hidden name="id" value="<%= item.product.id %>">
+                        <button class="btn" type="submit">Delete</button>
+                    </form>
+                </div>
+            </li>
+            <% } %>
+        </ul>
         <div>
-            <div><%= item.title %> ( <%= item.count %> )</div>
-            <!-- <img src="<%= item.imageUrl || "/img/mollu.jfif" %>" alt="<%= item.title %>"> -->
-            <div>Price: <%= item.price %></div>
-            <div><%= item.description %></div>
-            <form action="/cart-delete-item" method="POST">
-                <input hidden name="id" value="<%= item.id %>">
-                <button class="btn" type="submit">Delete</button>
-            </form>
+            <div class="cart_title">Total Price</div>
+            <div><%= cart.totalPrice %></div>
         </div>
-        </li>
-        <% } %>
-    </ul>
-    <div>
-        <div class="cart_title">Total Price</div>
-        <div><%= cart.totalPrice %></div>
+        <form action="/create-order" method="post" class="cart_form">
+            <button class="btn" type="submit">Order</button>
+        </form>
     </div>
     <% } else { %>
         <h2>There is no Items in your cart!</h2>
