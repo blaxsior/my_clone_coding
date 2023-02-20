@@ -1,3 +1,25 @@
 <%- include('../layouts/header.ejs', {css_list: []}) %>
-
+    <main>
+        <% if(orders.length> 0) { %>
+            <ul>
+                <% orders.forEach(order => { %>
+                    <li>
+                        <h1># <%= order.id %></h1>
+                        <h3>Products</h3>
+                        <ul>
+                            <% order.items.forEach(item => { %>
+                                <div>Pid: <%= item.product.id %></div>
+                                <div>Title: <%= item.product.title %> (<%= item.quantity %>)</div>
+                                <div>Desc: <%= item.product.description %></div>
+                                <div>Price: <%= item.product.price %></div>
+                            <% }) %>
+                        </ul>
+                        <div></div>
+                    </li>
+                <% }); %>
+            </ul>
+            <% } else { %>
+                <h1>Nothings There!</h1>
+                <% } %>
+    </main>
 <%- include('../layouts/footer.ejs') %>

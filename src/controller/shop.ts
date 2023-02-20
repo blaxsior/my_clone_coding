@@ -1,4 +1,5 @@
 import type { RequestHandler } from 'express';
+import { db } from '../db/index.js';
 import { CartEntity } from '../model/cart.js';
 import { OrderEntity } from '../model/order.js';
 import { ProductEntity } from '../model/product.js';
@@ -96,20 +97,31 @@ export const postDeleteFromCart: RequestHandler = async (req, res, next) => {
 }
 
 export const getOrders: RequestHandler = async (req, res, next) => {
-    res.render('shop/orders', {
-        pageTitle: 'Your Orders',
-        path: '/orders'
-    });
+    const user = req.user;
+    if (user) {
+        const orders = await OrderEntity.getOrdersByUid({
+            uid: user.id
+        });
+        return res.render('shop/orders', {
+            pageTitle: 'Your Orders',
+            path: '/orders',
+            orders : orders
+        });
+    }
+    res.redirect('not-found');
 }
 
 export const postOrder: RequestHandler = async (req, res, next) => {
     const user = req.user;
-    if(user) {
+    if (user) {
         const cart = await CartEntity.getCartEntityByUid(user.id);
-        if(cart) {
-            const items = await cart.getCartItems();
-            const order = new OrderEntity({uid: user.id});
-            await order.save(items); // 주문 생성
+        if (cart) {
+            db.$transaction(async (tx) => {
+                const items = await cart.getCartItems();
+                const order = new OrderEntity({ uid: user.id });
+                await order.save(items); // 주문 생성
+                await cart.deleteProducts();
+            });
         }
     }
 

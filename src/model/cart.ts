@@ -92,6 +92,25 @@ export class CartEntity implements ICart {
         });
     }
 
+        /**
+     * 현재 카트에서 제품 목록을 제거
+     * @param pid 제품 id
+     * @param qty 제품의 양
+     */
+        async deleteProducts(pid_list?: number[]) {
+            // if(pid_list) {
+
+            // }
+            await db.cartItem.deleteMany({
+                where: {
+                    cid: this.id,
+                    pid: {
+                        in: pid_list
+                    }
+                }
+            });
+        }
+
     /**
      * 현재 장바구니에 담긴 카트 아이템 리스트 반환.  
      * product 자체는 포함되지 않음.

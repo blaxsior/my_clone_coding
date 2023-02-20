@@ -1,8 +1,8 @@
 import { db } from "../db/index.js";
-import type { Order as IOrder, OrderItem as IOrderItem, Prisma } from "@prisma/client";
+import type { Order as IOrder, Order, OrderItem as IOrderItem, OrderItem, Prisma, Product } from "@prisma/client";
 import { Optional } from "../interface/index.js";
 
-export class OrderEntity implements IOrder  {
+export class OrderEntity implements IOrder {
     id: number;
     uid: number;
 
@@ -16,8 +16,8 @@ export class OrderEntity implements IOrder  {
      * 현재 주문이 존재하지 않는 경우 사용할 수 없음.
      * @param items 
      */
-    async addProducts(items: Omit<IOrderItem[],'id'>) {
-        if(this.id > -1) {
+    async addProducts(items: Omit<IOrderItem[], 'id'>) {
+        if (this.id > -1) {
             await db.orderItem.createMany({
                 data: items.map(it => {
                     return {
@@ -35,23 +35,24 @@ export class OrderEntity implements IOrder  {
      * this.addProducts와는 구분됨.
      * @param items 아이템 목록
      */
-    async save(items?: Omit<IOrderItem,'oid'>[]) {
-        const result = items 
-        ? await db.order.create({
-            data: {
-                uid: this.uid,
-                items: {
-                    createMany: {
-                        data: items.map(it => ({pid: it.pid, quantity: it.quantity}))
-                    }
-                },
-            }})
-        : await db.order.create({
-            data: {
-                uid: this.uid
-            }
-        });
-        
+    async save(items?: Omit<IOrderItem, 'oid'>[]) {
+        const result = items
+            ? await db.order.create({
+                data: {
+                    uid: this.uid,
+                    items: {
+                        createMany: {
+                            data: items.map(it => ({ pid: it.pid, quantity: it.quantity }))
+                        }
+                    },
+                }
+            })
+            : await db.order.create({
+                data: {
+                    uid: this.uid
+                }
+            });
+
         this.id = result.id;
     }
 
@@ -68,17 +69,25 @@ export class OrderEntity implements IOrder  {
     }
 
     /**
-     * 사용자의 id 값을 기반으로 주문 목록을 모두 가져온다.
+     * 사용자의 id 값을 기반으로 주문 목록을 모두 가져오되, orderitem 및 product 데이터를 함께 가져온다.
      * @param  uid  사용자의 id 값
      * @param limit 제한할 값
      */
-    static async getOrdersByUid(uid: number, offset?: number, limit?: number) {
+    static async getOrdersByUid(data: {uid: number, offset?: number, limit?: number})
+    {
         const orders = await db.order.findMany({
             where: {
-                uid: uid
+                uid: data.uid
             },
-            skip: offset,
-            take: limit
+            include: {
+                items: {
+                    include: {
+                        product: true
+                    },
+                },
+            },
+            skip: data.offset,
+            take: data.limit
         });
         return orders;
     }
