@@ -1,52 +1,50 @@
-import { Product as IProduct, User as IUser } from "@prisma/client";
-import { db } from "../db/index.js";
-import type { Optional } from "../interface/index.js";
-export class UserEntity implements IUser {
-    id: number;
-    name: string;
-    email: string;
+import { ObjectId } from "mongodb";
+import { mongodb } from "../db/mongo.index.js";
 
-    constructor({ id, name, email }: Optional<IUser, 'id'>) {
-        this.id = id ?? -1;
-        this.name = name;
-        this.email = email;
+interface IUser {
+    _id?: ObjectId;
+    name?: string;
+    email?: string;
+}
+export class UserEntity implements IUser {
+    private static collection = mongodb.collection<IUser>('users');
+    _id?: ObjectId;
+    name?: string;
+    email?: string;
+
+    constructor(data: IUser) {
+        this._id = data._id;
+        this.name = data.name;
+        this.email = data.email;
     }
 
     public async save() {
-        if (this.id > -1) {
-            await db.user.update({
-                data: {
-                    email: this.email,
-                    name: this.name
-                },
-                where: {
-                    id: this.id
-                }
-            })
-        } else {
-            const { id } = await db.user.create({
-                data: {
-                    name: this.name,
-                    email: this.email
-                }
-            });
-            this.id = id;
+        const result = await UserEntity.collection.insertOne({
+            email: this.email,
+            name: this.name
+        });
+        this._id = result.insertedId;
+    }
+
+    static async findById(id: string) {
+        let _id: ObjectId;
+        let data; 
+        try { // id 값이 12bytes string 또는 24 hex integer이 아니면 오류 발생.
+            _id = new ObjectId(id);
+            data = await this.collection.findOne({ _id });
         }
-    }
-
-    get data(): IUser {
-        return structuredClone(this);
-    }
-
-    static async findById(id: string | number) {
-        const data = isNaN(Number(id))
-            ? null
-            : await db.user.findFirst({ where: { id: Number(id) } });
-            
+        catch {
+            data = null;
+        }
         return data ? new UserEntity(data) : null;
     }
 
-    static async deleteById(id: string | number) {
-        await db.user.delete({ where: { id: Number(id) } });
+    static async findByUserInfo(info: IUser) {
+        const data = await this.collection.findOne({ name: info.name, email: info.email })
+        return data ? new UserEntity(data) : null;
+    }
+
+    static async deleteById(id: string) {
+        await this.collection.deleteOne({ _id: new ObjectId(id) });
     }
 }
