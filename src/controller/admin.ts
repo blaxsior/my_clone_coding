@@ -15,13 +15,14 @@ export const getAddProduct: RequestHandler = (req, res, next) => {
 
 // /admin/add-product POST
 export const postAddProduct: RequestHandler = async (req, res, next) => {
+    const user = req.user;
     const { title, imageUrl, price, description } = req.body;
     const product = new ProductEntity({
         title,
         imageUrl,
         price,
         description,
-        uid: req.user?.id
+        uid: user?._id
     });
     await product.save();
     // const product = new ProductEntity({title, imageUrl, price, description,uid: req.user?.id});
@@ -37,9 +38,8 @@ export const getEditProduct: RequestHandler = async (req, res, next) => {
     if (!edit) {
         return res.redirect('/');
     }
-    // || req.user?.id != req.cookies['uid'] 같은 authorization 기능은 나중에 고려
 
-    const prod = await ProductEntity.findById(Number(id));
+    const prod = await ProductEntity.findById(id);
     if (prod) {
         return res.render('admin/edit-product', {
             pageTitle: 'Add Product',
@@ -57,7 +57,7 @@ export const postEditProduct: RequestHandler = async (req, res, next) => {
 
     const { id, title, imageUrl, price, description } = req.body;
 
-    const product = await ProductEntity.findById(Number(id));
+    const product = await ProductEntity.findById(id);
     if (product) {
         product.setData({title, imageUrl, price, description});
         await product.save();
@@ -68,8 +68,7 @@ export const postEditProduct: RequestHandler = async (req, res, next) => {
 
 // /admin/products
 export const getProducts: RequestHandler = async (req, res, next) => {
-    const uid = req.user?.id;
-    console.log('uid = ', uid);
+    const uid = req.user?._id;
     const products = uid
         ? await ProductEntity.findManyByUid(uid)
         : [];
@@ -88,7 +87,7 @@ export const postDeleteProduct: RequestHandler = async (req, res, next) => {
 
     const dProd = await ProductEntity.findById(id);
     if (dProd) {
-        await ProductEntity.deleteById(dProd.id!);
+        await ProductEntity.deleteById(dProd._id!);
        // await CartEntity.deleteProduct(id, dProd.price);
     }
 

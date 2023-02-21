@@ -8,7 +8,7 @@ import { router as adminRouter } from './routes/admin.js';
 import { router as shopRouter } from './routes/shop.js';
 import * as errorHandler from './controller/error.js';
 /* sql db connection */
-import { db } from './db/index.js';
+import { mongodbConn } from './db/mongo.index.js';
 import { UserEntity } from './model/user.js';
 const server = e();
 
@@ -32,9 +32,9 @@ server.use('/', (req, res, next) => {
 });
 
 try {
-    await db.$connect();
+    await mongodbConn();
     {
-        let existedUser = await UserEntity.findById(1);
+        let existedUser = await UserEntity.findByUserInfo({name: "blaxsior"});
         if (!existedUser) {
             const user = new UserEntity({ name: "blaxsior", email: "hello@hotmail.com" });
             await user.save();

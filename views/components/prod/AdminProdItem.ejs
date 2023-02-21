@@ -5,7 +5,7 @@
             <a href="/admin/edit-product/<%= prod.id %>?edit=true">Edit</a>
         </button>
         <form action="/admin/delete-product" method="POST">
-            <input type="hidden" name="id" value="<%= prod.id %>">
+            <input type="hidden" name="id" value="<%= prod._id %>">
             <button class="btn" type="submit">Delete</button>
         </form>
     </div>

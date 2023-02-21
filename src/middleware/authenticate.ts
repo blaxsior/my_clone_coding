@@ -6,7 +6,7 @@ export const authenticate: RequestHandler = async (req, res, next) => {
     const user = await UserEntity.findById(uid);
     if(user) {
         req.user = user;
+        console.log(`user ${user.name} : ${user.email}, [${req.method}: ${req.url}]`);
     }
-
     next();
 }
