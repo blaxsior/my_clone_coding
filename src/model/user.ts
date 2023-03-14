@@ -19,16 +19,27 @@ export class UserEntity implements IUser {
     }
 
     public async save() {
-        const result = await UserEntity.collection.insertOne({
-            email: this.email,
-            name: this.name
-        });
-        this._id = result.insertedId;
+        if (this._id) {
+            await UserEntity.collection.updateOne({
+                _id: this._id
+            }, {
+                $set:{
+                    email: this.email,
+                    name: this.name
+                }
+            });
+        } else {
+            const result = await UserEntity.collection.insertOne({
+                email: this.email,
+                name: this.name
+            });
+            this._id = result.insertedId;
+        }
     }
 
     static async findById(id: string) {
         let _id: ObjectId;
-        let data; 
+        let data;
         try { // id 값이 12bytes string 또는 24 hex integer이 아니면 오류 발생.
             _id = new ObjectId(id);
             data = await this.collection.findOne({ _id });

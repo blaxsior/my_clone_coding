@@ -25,8 +25,6 @@ export const postAddProduct: RequestHandler = async (req, res, next) => {
         uid: user?._id
     });
     await product.save();
-    // const product = new ProductEntity({title, imageUrl, price, description,uid: req.user?.id});
-    // await product.save();
     res.redirect('/');
     req.user
 }
@@ -53,13 +51,17 @@ export const getEditProduct: RequestHandler = async (req, res, next) => {
 
 // /admin/edit-product POST
 export const postEditProduct: RequestHandler = async (req, res, next) => {
-    console.log("body", req.body);
 
     const { id, title, imageUrl, price, description } = req.body;
 
     const product = await ProductEntity.findById(id);
     if (product) {
-        product.setData({title, imageUrl, price, description});
+        product.title = title;
+        product.imageUrl = imageUrl;
+        product.price = price;
+        product.description = description;
+        product.uid = req.user?._id;
+
         await product.save();
         return res.redirect('/admin/products');
     }

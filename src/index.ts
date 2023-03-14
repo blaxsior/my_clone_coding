@@ -4,9 +4,9 @@ import cookieParser from 'cookie-parser';
 import { authenticate } from './middleware/authenticate.js';
 
 /* import routers */
-import { router as adminRouter } from './routes/admin.js';
-import { router as shopRouter } from './routes/shop.js';
-import * as errorHandler from './controller/error.js';
+import { router as adminRouter } from './routes/admin.route.js';
+import { router as shopRouter } from './routes/shop.route.js';
+import * as errorHandler from './controller/error.controller.js';
 /* sql db connection */
 import { mongodbConn } from './db/mongo.index.js';
 import { UserEntity } from './model/user.js';
@@ -33,15 +33,15 @@ server.use('/', (req, res, next) => {
 
 try {
     await mongodbConn();
-    {
-        let existedUser = await UserEntity.findByUserInfo({name: "blaxsior"});
-        if (!existedUser) {
-            const user = new UserEntity({ name: "blaxsior", email: "hello@hotmail.com" });
-            await user.save();
-            existedUser = user;
-        }
-        console.log(existedUser);
-    }
+    // {
+    //     let existedUser = await UserEntity.findByUserInfo({name: "blaxsior"});
+    //     if (!existedUser) {
+    //         const user = new UserEntity({ name: "blaxsior", email: "hello@hotmail.com" });
+    //         await user.save();
+    //         existedUser = user; 
+    //     }
+    //     console.log(existedUser);
+    // }
     server.listen(KEY.PORT);
 } catch (e) {
     if (e instanceof Error) {

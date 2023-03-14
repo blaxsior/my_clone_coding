@@ -7,6 +7,8 @@ export const authenticate: RequestHandler = async (req, res, next) => {
     if(user) {
         req.user = user;
         console.log(`user ${user.name} : ${user.email}, [${req.method}: ${req.url}]`);
+    } else {
+        console.log(`no user`);
     }
     next();
 }

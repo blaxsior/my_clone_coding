@@ -2,7 +2,7 @@
     <%- include('./ProdInfo', {prod}) %>
     <div class="card__actions">
         <button class="btn">
-            <a href="/admin/edit-product/<%= prod.id %>?edit=true">Edit</a>
+            <a href="/admin/edit-product/<%= prod._id %>?edit=true">Edit</a>
         </button>
         <form action="/admin/delete-product" method="POST">
             <input type="hidden" name="id" value="<%= prod._id %>">
