@@ -11,10 +11,15 @@ const KEY = {
             DB: process.env.MYSQL_DB,
             PASSWORD: process.env.MYSQL_PASSWORD
         },
+        mongodb: {
+            USER: process.env.MONGODB_USER,
+            PASSWORD: process.env.MONGODB_PASSWORD,
+            DB: process.env.MONGODB_DB
+        }
     },
     SESSION: {
-        KEY: process.env.EXPRESS_SESSION_KEY
-    }
-}
+        KEY: process.env.EXPRESS_SESSION_KEY,
+    },
+};
 
 export default KEY;

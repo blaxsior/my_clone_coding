@@ -7,10 +7,11 @@ import session from 'express-session';
 import MS from 'connect-mongodb-session';
 import { authenticate } from './middleware/authenticate.js';
 
-// const MongoStore = MS(session);
-// const store = new MongoStore({
-
-// });
+const MongoStore = MS(session);
+const store = new MongoStore({
+    uri: `mongodb+srv://${KEY.DB.mongodb.USER}:${KEY.DB.mongodb.PASSWORD}@node-mongo.no4qmpi.mongodb.net/${KEY.DB.mongodb.DB}?retryWrites=true&w=majority`,
+    collection: 'sessions',
+});
 
 /* import routers */
 import { router as adminRouter } from './routes/admin.route.js';
@@ -33,7 +34,8 @@ server.use(cookieParser());
 server.use(session({
     secret: KEY.SESSION.KEY??"default",
     resave:false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    store: store
 }))
 server.use(authenticate);
 
