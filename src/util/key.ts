@@ -10,7 +10,10 @@ const KEY = {
             USER: process.env.MYSQL_USER,
             DB: process.env.MYSQL_DB,
             PASSWORD: process.env.MYSQL_PASSWORD
-        }
+        },
+    },
+    SESSION: {
+        KEY: process.env.EXPRESS_SESSION_KEY
     }
 }
 

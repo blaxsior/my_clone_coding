@@ -1,6 +1,6 @@
 import type { RequestHandler } from "express";
-import { CartEntity } from "../model/cart.js";
-import { ProductEntity } from "../model/product.js";
+import { CartEntity } from "../model/cart.model.js";
+import { ProductEntity } from "../model/product.model.js";
 
 // /admin/add-product GET
 export const getAddProduct: RequestHandler = (req, res, next) => {
@@ -8,8 +8,8 @@ export const getAddProduct: RequestHandler = (req, res, next) => {
         pageTitle: 'Add Product',
         path: '/admin/add-product',
         product: {},
-        editing: false
-
+        editing: false,
+        isauthenticated: !!req.user
     });
 }
 
@@ -21,7 +21,7 @@ export const postAddProduct: RequestHandler = async (req, res, next) => {
         imageUrl,
         price,
         description,
-        uid: req.user?.id
+        uid: req.user?.id,
     });
     await product.save();
     // const product = new ProductEntity({title, imageUrl, price, description,uid: req.user?.id});
@@ -45,7 +45,8 @@ export const getEditProduct: RequestHandler = async (req, res, next) => {
             pageTitle: 'Add Product',
             path: '/admin/products',
             product: prod,
-            editing: edit
+            editing: edit,
+            isauthenticated: !!req.user
         });
     }
     res.redirect('/not-found');
@@ -77,7 +78,8 @@ export const getProducts: RequestHandler = async (req, res, next) => {
         prods: products,
         pageTitle: 'Admin Products',
         path: '/admin/products',
-        hasProducts: products.length > 0
+        hasProducts: products.length > 0,
+        isauthenticated: !!req.user
     });
 };
 

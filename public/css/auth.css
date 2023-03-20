@@ -1,0 +1,10 @@
+.login-form {
+    width: 20rem;
+    max-width: 90%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    flex-flow: column wrap;
+
+    gap: 1rem;
+}

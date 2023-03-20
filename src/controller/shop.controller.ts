@@ -1,9 +1,9 @@
 import type { RequestHandler } from 'express';
 import { db } from '../db/index.js';
-import { CartEntity } from '../model/cart.js';
-import { OrderEntity } from '../model/order.js';
-import { ProductEntity } from '../model/product.js';
-
+import { CartEntity } from '../model/cart.model.js';
+import { OrderEntity } from '../model/order.model.js';
+import { ProductEntity } from '../model/product.model.js';
+  
 /* 제품 화면 */
 export const getProducts: RequestHandler = async (req, res, next) => {
     const products = await ProductEntity.fetchAll();
@@ -13,7 +13,8 @@ export const getProducts: RequestHandler = async (req, res, next) => {
         path: '/products',
         hasProducts: products.length > 0,
         activeShop: true,
-        productCSS: true
+        productCSS: true,
+        isauthenticated: !!req.user
     });
 };
 
@@ -29,7 +30,8 @@ export const getProductDetail: RequestHandler = async (req, res, next) => {
             pageTitle: `Detail- ${product.title}`,
             path: '/products',
             activeShop: true,
-            productCSS: true
+            productCSS: true,
+            isauthenticated: !!req.user
         });
     }
     res.redirect('/not-found');
@@ -46,7 +48,8 @@ export const getIndex: RequestHandler = async (req, res, next) => {
         path: '/',
         hasProducts: products.length > 0,
         activeShop: true,
-        productCSS: true
+        productCSS: true,
+        isauthenticated: !!req.user
     });
 }
 
@@ -58,7 +61,8 @@ export const getCart: RequestHandler = async (req, res, next) => {
         return res.render('shop/cart', {
             path: '/cart',
             pageTitle: 'Your Cart',
-            cart: cart
+            cart: cart,
+            isauthenticated: !!req.user
         });
     }
 
@@ -105,7 +109,8 @@ export const getOrders: RequestHandler = async (req, res, next) => {
         return res.render('shop/orders', {
             pageTitle: 'Your Orders',
             path: '/orders',
-            orders : orders
+            orders : orders,
+            isauthenticated: !!req.user
         });
     }
     res.redirect('not-found');
@@ -134,6 +139,7 @@ export const postOrder: RequestHandler = async (req, res, next) => {
 export const getCheckout: RequestHandler = async (req, res, next) => {
     res.render('shop/checkout', {
         pageTitle: 'Checkout',
-        path: '/checkout'
+        path: '/checkout',
+        isauthenticated: !!req.user
     });
 }

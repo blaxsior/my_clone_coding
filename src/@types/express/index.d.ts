@@ -1,7 +1,10 @@
 declare namespace Express {
     type User = import('../../model/user.js').UserEntity
     interface Request {
-        user?: User
+        user?: User,
+        session: {
+            uid?: number
+        }
         // user?: User
     }
 }
