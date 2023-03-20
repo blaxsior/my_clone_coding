@@ -14,14 +14,13 @@ export const getProducts: RequestHandler = async (req, res, next) => {
         hasProducts: products.length > 0,
         activeShop: true,
         productCSS: true,
-        isauthenticated: !!req.user
+        isauthenticated: !!req.session.user
     });
 };
 
 /* 디테일 페이지 */
 export const getProductDetail: RequestHandler = async (req, res, next) => {
     const { id } = req.params;
-    req.user
 
     const product = await ProductEntity.findById(Number(id));
     if (product) {
@@ -31,7 +30,7 @@ export const getProductDetail: RequestHandler = async (req, res, next) => {
             path: '/products',
             activeShop: true,
             productCSS: true,
-            isauthenticated: !!req.user
+            isauthenticated: !!req.session.user
         });
     }
     res.redirect('/not-found');
@@ -49,20 +48,20 @@ export const getIndex: RequestHandler = async (req, res, next) => {
         hasProducts: products.length > 0,
         activeShop: true,
         productCSS: true,
-        isauthenticated: !!req.user
+        isauthenticated: !!req.session.user
     });
 }
 
 /* 카트 페이지 */
 export const getCart: RequestHandler = async (req, res, next) => {
-    const user = req.user;
+    const user = req.session.user;
     if (user) {
         let cart = await CartEntity.getCartDataByUid(user.id);
         return res.render('shop/cart', {
             path: '/cart',
             pageTitle: 'Your Cart',
             cart: cart,
-            isauthenticated: !!req.user
+            isauthenticated: !!user
         });
     }
 
@@ -73,7 +72,7 @@ export const getCart: RequestHandler = async (req, res, next) => {
 export const postAddToCart: RequestHandler = async (req, res, next) => {
     const { id } = req.body;
     const product = await ProductEntity.findById(id);
-    const user = req.user;
+    const user = req.session.user;
     console.log('post cart');
     if (product && user) { // 제품 및 유저 존재         
         let cart = await CartEntity.getCartEntityByUid(user.id);
@@ -89,7 +88,7 @@ export const postAddToCart: RequestHandler = async (req, res, next) => {
 export const postDeleteFromCart: RequestHandler = async (req, res, next) => {
     const { id } = req.body;
     const product = await ProductEntity.findById(id);
-    const user = req.user;
+    const user = req.session.user;
     if (product && user) {
         let cart = await CartEntity.getCartEntityByUid(user.id);
         if (cart) {
@@ -101,7 +100,7 @@ export const postDeleteFromCart: RequestHandler = async (req, res, next) => {
 }
 
 export const getOrders: RequestHandler = async (req, res, next) => {
-    const user = req.user;
+    const user = req.session.user;
     if (user) {
         const orders = await OrderEntity.getOrdersByUid({
             uid: user.id
@@ -110,14 +109,14 @@ export const getOrders: RequestHandler = async (req, res, next) => {
             pageTitle: 'Your Orders',
             path: '/orders',
             orders : orders,
-            isauthenticated: !!req.user
+            isauthenticated: !!req.session.user
         });
     }
     res.redirect('not-found');
 }
 
 export const postOrder: RequestHandler = async (req, res, next) => {
-    const user = req.user;
+    const user = req.session.user;
     if (user) {
         const cart = await CartEntity.getCartEntityByUid(user.id);
         if (cart) {
@@ -140,6 +139,6 @@ export const getCheckout: RequestHandler = async (req, res, next) => {
     res.render('shop/checkout', {
         pageTitle: 'Checkout',
         path: '/checkout',
-        isauthenticated: !!req.user
+        isauthenticated: !!req.session.user
     });
 }

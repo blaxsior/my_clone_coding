@@ -32,12 +32,16 @@ server.use(e.json());
 server.use(e.urlencoded({ extended: true }));
 server.use(cookieParser());
 server.use(session({
+    cookie: {
+        httpOnly: true,
+        maxAge: 3600 * 60
+    },
     secret: KEY.SESSION.KEY??"default",
     resave:false,
     saveUninitialized: false,
     store: store
 }))
-server.use(authenticate);
+// server.use(authenticate);
 
 /* router settings */
 server.use('/admin', adminRouter);

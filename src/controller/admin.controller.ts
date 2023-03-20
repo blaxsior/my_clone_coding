@@ -1,5 +1,4 @@
 import type { RequestHandler } from "express";
-import { CartEntity } from "../model/cart.model.js";
 import { ProductEntity } from "../model/product.model.js";
 
 // /admin/add-product GET
@@ -9,7 +8,7 @@ export const getAddProduct: RequestHandler = (req, res, next) => {
         path: '/admin/add-product',
         product: {},
         editing: false,
-        isauthenticated: !!req.user
+        isauthenticated: !!req.session.user
     });
 }
 
@@ -21,13 +20,12 @@ export const postAddProduct: RequestHandler = async (req, res, next) => {
         imageUrl,
         price,
         description,
-        uid: req.user?.id,
+        uid: req.session.user?.id,
     });
     await product.save();
     // const product = new ProductEntity({title, imageUrl, price, description,uid: req.user?.id});
     // await product.save();
     res.redirect('/');
-    req.user
 }
 
 // /admin/edit-product/:id?edit=true GET
@@ -46,7 +44,7 @@ export const getEditProduct: RequestHandler = async (req, res, next) => {
             path: '/admin/products',
             product: prod,
             editing: edit,
-            isauthenticated: !!req.user
+            isauthenticated: !!req.session.user
         });
     }
     res.redirect('/not-found');
@@ -69,7 +67,7 @@ export const postEditProduct: RequestHandler = async (req, res, next) => {
 
 // /admin/products
 export const getProducts: RequestHandler = async (req, res, next) => {
-    const uid = req.user?.id;
+    const uid = req.session.user?.id;
     console.log('uid = ', uid);
     const products = uid
         ? await ProductEntity.findManyByUid(uid)
@@ -79,7 +77,7 @@ export const getProducts: RequestHandler = async (req, res, next) => {
         pageTitle: 'Admin Products',
         path: '/admin/products',
         hasProducts: products.length > 0,
-        isauthenticated: !!req.user
+        isauthenticated: !!req.session.user
     });
 };
 
