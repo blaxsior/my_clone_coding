@@ -5,7 +5,7 @@
         <p>List of all the products...</p>
         <div class="grid">
             <% for(let prod of prods) { %>
-                <%- include('../components/prod/ProdItem',{prod: prod}) %>
+                <%- include('../components/prod/ProdItem',{prod: prod, isauthenticated:isauthenticated}) %>
             <% } %>
         </div>
     <% } else { %>

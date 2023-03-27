@@ -2,6 +2,8 @@
 <main class="centered">
     <h1>Product Detail</h1>
     <%- include('../components/prod/ProdInfo',{prod:prod}) %>
-    <%- include('../components/cart/AddToCart',{id: prod.id}) %>
+    <% if(isauthenticated) { %>
+        <%- include('../components/cart/AddToCart',{id: prod.id}) %>
+    <% } %>
 </main>
 <%- include('../layouts/footer.ejs') %>

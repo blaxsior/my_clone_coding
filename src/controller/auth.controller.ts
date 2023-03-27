@@ -18,10 +18,12 @@ export const postLogin: RequestHandler = async (req,res,next) => {
     const user = await UserEntity.findById(1);
     if(user) {
         req.session.user = user;
+        return req.session.save((e) => {
+            res.redirect('/');
+        }); // 경우에 따라 데이터베이스에 반영되는 속도보다 redirect가 빠를 수 있다.
+        // save 메서드를 이용하여 실제로 반영된 이후에 처리하도록 수정한다.
     }
-
-    // req.session.user = 
-    res.redirect('/');
+    res.redirect('/login');
 };
 
 export const postLogout: RequestHandler = async (req, res, next) => {

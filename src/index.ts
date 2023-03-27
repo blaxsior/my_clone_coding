@@ -41,7 +41,7 @@ server.use(session({
     saveUninitialized: false,
     store: store
 }))
-// server.use(authenticate);
+server.use(authenticate);
 
 /* router settings */
 server.use('/admin', adminRouter);

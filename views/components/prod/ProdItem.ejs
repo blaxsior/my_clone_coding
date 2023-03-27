@@ -4,6 +4,8 @@
         <button class="btn">
             <a href="/products/<%= prod.id %>">Details</a>
         </button>
-        <%- include('../cart/AddToCart',{id: prod.id}) %>
+        <% if(isauthenticated) { %>
+            <%- include('../cart/AddToCart',{id: prod.id}) %>
+        <% } %>
     </div>
 </article>
