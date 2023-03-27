@@ -26,6 +26,7 @@ model User {
   id    Int    @id @default(autoincrement())
   name  String
   email String
+  password String @default("password")
 
   products Product[]
   cart     Cart?
@@ -36,7 +37,7 @@ model Cart {
   uid Int @unique
 
   items CartItem[] // many-to-many explicitly
-  user  User       @relation(fields: [uid], references: [id])
+  user  User       @relation(fields: [uid], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model CartItem {
