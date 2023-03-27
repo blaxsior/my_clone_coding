@@ -54,15 +54,6 @@ server.use('/', (req, res, next) => {
 
 try {
     await db.$connect();
-    {
-        let existedUser = await UserEntity.findById(1);
-        if (!existedUser) {
-            const user = new UserEntity({ name: "blaxsior", email: "hello@hotmail.com" });
-            await user.save();
-            existedUser = user;
-        }
-        console.log(existedUser);
-    }
     server.listen(KEY.PORT);
 } catch (e) {
     if (e instanceof Error) {

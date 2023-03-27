@@ -120,12 +120,12 @@ export const postOrder: RequestHandler = async (req, res, next) => {
     if (user) {
         const cart = await CartEntity.getCartEntityByUid(user.id);
         if (cart) {
-            db.$transaction(async (tx) => {
+            await db.$transaction(async (tx) => {
                 const items = await cart.getCartItems();
                 const order = new OrderEntity({ uid: user.id });
                 await order.save(items); // 주문 생성
                 await cart.deleteProducts();
-            });
+            }); // await 처리 안해둬서 계속 문제가 발생했었음...
             return res.redirect('orders');
         }
     }

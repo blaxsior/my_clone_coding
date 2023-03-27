@@ -1,8 +1,12 @@
 import {Router} from 'express';
-import { getLogin,postLogin,postLogout } from '../controller/auth.controller.js';
+import * as AuthCont from '../controller/auth.controller.js';
 
 export const router = Router();
 
-router.get('/login', getLogin);
-router.post('/login', postLogin);
-router.post('/logout', postLogout);
+router.get('/login', AuthCont.getLogin);
+router.post('/login', AuthCont.postLogin);
+
+router.post('/logout', AuthCont.postLogout);
+
+router.get('/signup', AuthCont.getSignup);
+router.post('/signup', AuthCont.postSignup);

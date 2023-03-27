@@ -28,6 +28,10 @@
                 <a href='/login'
                     class="<%= (path ==='/login') ? 'active' : '' %>">Login</a>
             </li>
+            <li class="main-header__item">
+                <a href='/signup'
+                    class="<%= (path ==='/signup') ? 'active' : '' %>">Sign Up</a>
+            </li>
             <% } else { %>
             <li class="main-header__item">
                 <form method="post" action="/logout">
