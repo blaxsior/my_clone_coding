@@ -27,7 +27,7 @@ export class ProductEntity implements IProduct {
         const _price = Number(data.price);
         this.price = isNaN(_price) ? 0 : _price;
         this.description = data.description;
-        this.uid = data.uid ?? null;
+        this.uid = data.uid ?? this.uid ?? null;
     }
 
     // private static getId() {

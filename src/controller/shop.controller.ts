@@ -126,13 +126,15 @@ export const postOrder: RequestHandler = async (req, res, next) => {
                 await order.save(items); // 주문 생성
                 await cart.deleteProducts();
             });
+            return res.redirect('orders');
         }
     }
-
-    res.render('shop/orders', {
-        pageTitle: 'Your Orders',
-        path: '/orders'
-    });
+    res.redirect('not-found');
+    // res.render('shop/orders', {
+    //     pageTitle: 'Your Orders',
+    //     path: '/orders',
+    //     isauthenticated: !!req.session.user
+    // });
 }
 
 export const getCheckout: RequestHandler = async (req, res, next) => {
