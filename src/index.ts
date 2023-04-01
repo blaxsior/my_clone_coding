@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 // about session
 import session from 'express-session';
 import MS from 'connect-mongodb-session';
-import { authenticate } from './middleware/authenticate.js';
+import { authMiddleware, signupMiddleware } from './middleware/authenticate.js';
 
 const MongoStore = MS(session);
 const store = new MongoStore({
@@ -41,10 +41,10 @@ server.use(session({
     saveUninitialized: false,
     store: store
 }))
-server.use(authenticate);
+server.use(signupMiddleware);
 
 /* router settings */
-server.use('/admin', adminRouter);
+server.use('/admin', authMiddleware ,adminRouter);
 server.use(authRouter);
 server.use(shopRouter);
 server.get('/not-found', errorHandler.get404);

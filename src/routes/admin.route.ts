@@ -1,7 +1,9 @@
 import { Router } from "express";
 import {postAddProduct, getAddProduct, getProducts, getEditProduct, postEditProduct, postDeleteProduct} from '../controller/admin.controller.js';
+import { authMiddleware } from "../middleware/authenticate.js";
 
 export const router = Router();
+
 // /admin/add-product => GET
 router.get('/add-product', getAddProduct);
 
